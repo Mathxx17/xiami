@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario Floral Interactivo</title>
+    <!-- Tailwind CSS for modern layout utilities -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for floral and UI icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Playfair Display for elegant typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #fcf6f0;
+            background-image: radial-gradient(#e2d1c3 0.75px, transparent 0.75px), radial-gradient(#e2d1c3 0.75px, #fcf6f0 0.75px);
+            background-size: 30px 30px;
+            background-position: 0 0, 15px 15px;
+        }
+
+        .title-font {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* 3D Book & Flip Animation Styles */
+        .book-container {
+            perspective: 1500px;
+        }
+
+        .book-page {
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+            transform-origin: left center;
+        }
+
+        .book-page.flipping {
+            transform: rotateY(-180deg);
+        }
+
+        /* Floral decorative borders and elements */
+        .floral-border {
+            border: 2px solid #d4a373;
+            box-shadow: 0 10px 25px -5px rgba(212, 163, 115, 0.2), 0 8px 10px -6px rgba(212, 163, 115, 0.2);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #d4a373;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-stone-700 flex flex-col justify-between">
+
+    <header class="py-6 px-4 text-center bg-white/80 backdrop-blur-md shadow-sm border-b border-stone-200">
+        <div class="max-w-4xl mx-auto flex items-center justify-center gap-3">
+            <span class="text-2xl">🌸</span>
+            <h1 class="title-font text-3xl md:text-4xl font-bold tracking-wide text-stone-800">Calendario de días pensados en ti 🌸</h1>
+            <span class="text-2xl">🌸</span>
+        </div>
+        <p class="text-xs md:text-sm text-stone-500 mt-1 uppercase tracking-widest">Del 26 de Julio al 20 de Agosto</p>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center p-4 md:p-8">
+        
+        <!-- VIEW 1: Calendar Grid Selection -->
+        <div id="calendar-view" class="w-full max-w-4xl bg-white/90 backdrop-blur-sm rounded-3xl p-6 md:p-10 floral-border transition-all duration-500">
+            <div class="text-center mb-8">
+                <span class="inline-block px-4 py-1 bg-amber-50 text-amber-800 text-xs font-semibold rounded-full uppercase tracking-wider mb-2 border border-amber-200">
+                    <i class="fa-solid fa-seedling mr-1"></i> Selecciona un día
+                </span>
+                <h2 class="title-font text-2xl md:text-3xl font-semibold text-stone-800">Haz clic en cualquier fecha para ver su mensaje</h2>
+            </div>
+
+            <!-- Block 1: July (26 - 31) -->
+            <div class="mb-8">
+                <div class="flex items-center gap-2 mb-4 border-b border-stone-200 pb-2">
+                    <i class="fa-solid fa-calendar-days text-amber-700"></i>
+                    <h3 class="title-font text-xl font-bold text-stone-700">Julio</h3>
+                </div>
+                <div id="grid-july" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+                    <!-- Dynamic Days injected by JS -->
+                </div>
+            </div>
+
+            <!-- Block 2: August (1 - 20) -->
+            <div>
+                <div class="flex items-center gap-2 mb-4 border-b border-stone-200 pb-2">
+                    <i class="fa-solid fa-calendar-days text-emerald-700"></i>
+                    <h3 class="title-font text-xl font-bold text-stone-700">Agosto</h3>
+                </div>
+                <div id="grid-august" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                    <!-- Dynamic Days injected by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 2: Floral Book / Card Reader with Page Flip Effect -->
+        <div id="book-view" class="hidden w-full max-w-2xl book-container">
+            <div id="page-card" class="book-page bg-white rounded-3xl p-6 md:p-10 floral-border relative overflow-hidden shadow-2xl">
+                
+                <!-- Floral Corner Accents (Top-Left & Bottom-Right) -->
+                <div class="absolute top-3 left-3 text-emerald-600/40 text-2xl pointer-events-none">
+                    <i class="fa-solid fa-pagelines"></i>
+                </div>
+                <div class="absolute top-3 right-3 text-amber-600/40 text-2xl pointer-events-none">
+                    <i class="fa-solid fa-spa"></i>
+                </div>
+                <div class="absolute bottom-3 left-3 text-amber-600/40 text-2xl pointer-events-none">
+                    <i class="fa-solid fa-spa"></i>
+                </div>
+                <div class="absolute bottom-3 right-3 text-emerald-600/40 text-2xl pointer-events-none">
+                    <i class="fa-solid fa-pagelines"></i>
+                </div>
+
+                <!-- Card Header -->
+                <div class="flex items-center justify-between border-b border-amber-100 pb-4 mb-6 px-4">
+                    <button onclick="backToCalendar()" class="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-full text-sm font-medium transition flex items-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-arrow-left"></i> Volver al Calendario
+                    </button>
+                    <div class="text-center">
+                        <span id="display-date-number" class="title-font text-3xl font-bold text-amber-800">26</span>
+                        <span id="display-date-month" class="block text-xs uppercase tracking-widest text-stone-400 font-semibold">Julio</span>
+                    </div>
+                    <div class="w-24"></div>
+                </div>
+
+                <!-- Floral Header Banner -->
+                <div class="text-center mb-6">
+                    <div class="inline-flex items-center justify-center gap-2 text-emerald-700 text-sm bg-emerald-50 px-4 py-1.5 rounded-full border border-emerald-200">
+                        <i class="fa-solid fa-seedling"></i>
+                        <span>❤️</span>
+                        <i class="fa-solid fa-seedling"></i>
+                    </div>
+                </div>
+
+                <!-- Display Message Area -->
+                <div class="mb-8 px-2">
+                    <div id="day-message-display" class="w-full p-6 bg-amber-50/40 border border-amber-200 rounded-2xl text-stone-700 text-base custom-scrollbar min-h-[160px] max-h-[250px] overflow-y-auto whitespace-pre-wrap leading-relaxed"></div>
+                </div>
+
+                <!-- Navigation Action Buttons -->
+                <div class="flex items-center justify-between pt-4 border-t border-amber-100 px-2">
+                    <button id="prev-day-btn" onclick="navigateDay(-1)" class="px-5 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl text-sm font-medium transition flex items-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-chevron-left"></i> Día anterior
+                    </button>
+                    <button id="next-day-btn" onclick="navigateDay(1)" class="px-6 py-2.5 bg-gradient-to-r from-amber-700 to-amber-600 hover:from-amber-800 hover:to-amber-700 text-white rounded-xl text-sm font-semibold shadow-md hover:shadow-lg transition flex items-center gap-2 cursor-pointer">
+                        Siguiente día <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="py-4 text-center text-xs text-stone-400 border-t border-stone-200 bg-white/50">
+        <p>xiami🌸</p>
+    </footer>
+
+    <script>
+        const allDays = [];
+
+        // Populate July 26-31
+        for (let d = 26; d <= 31; d++) {
+            allDays.push({ day: d, month: 'julio', monthName: 'Julio', key: `julio_${d}` });
+        }
+        // Populate August 1-20
+        for (let d = 1; d <= 20; d++) {
+            allDays.push({ day: d, month: 'agosto', monthName: 'Agosto', key: `agosto_${d}` });
+        }
+
+        let currentIndex = 0;
+
+        // AQUÍ ESCRIBES TUS TEXTOS FIJOS PARA QUE LA OTRA PERSONA LOS VEA:
+        const messagesData = {
+            // --- JULIO ---
+            "julio_26": "Hace 1 día q ya no hablamos, esto es todo raro, despertar y ver que mi teléfono ya no tiene una notificación tuya es muy diferente y difícil de procesar, espero q en lo q estés te valla bien",
+            "julio_27": "27/07/29 Esto es tan raro por qué no se como sentirme, no falta casi nada para mi cumpleaños y ya no te tengo pero si pasó algo fue por algo y el destino tiene otros planes para cada uno.",
+            "julio_28": "28/07/26 1 día para mi cumpleaños y aún no te superó, fuiste, eres y serías, la chica ideal para mí pero yo sé que si paso es por algo y no puedo obligar a nada solo quedarme con los bonitos recuerdos q tuvimos.",
+            "julio_29": "ese dia no hice nada pq hice mi fiesta y mori en el trago xd",
+            "julio_30": "30/07/26 Ayer no quise escribir nada ya que me sentía tan mal por cómo me puse con ese mensaje tuyo, el mundo se me vino abajo sentí que todo era un colapso pero traté de olvidarte y aún así no pude",
+            "julio_31": "31/07/26 Ya pasaron varios días de que no hablamos, para mí esto aún es una herida recién echa pero necesito dejarte ir por mi bien",
+
+            // --- AGOSTO ---
+            "agosto_1": "Hoy fue un día muy raro estaba olvidando las cosas y olvidarte hasta que escuché algo que tú cantabas y me recordó tu voz y tus sonrisas que no pude aguantar mi me hundí en el llanto",
+            "agosto_2": "Me ocupo de varias cosas pero no puedo olvidarte, son cosas que quedarán grabadas en mi corazón, intenté conocer a alguien pero no es lo mismo y tampoco quisiera hablar con alguien solo por despecho",
+            "agosto_3": "Me ocupo de varias cosas pero no puedo olvidarte, son cosas que quedarán grabadas en mi corazón, intenté conocer a alguien pero no es lo mismo y tampoco quisiera hablar con alguien solo por despecho",
+            "agosto_4": "Ya no me falta nada para viajar y poder olvidar algunas cosas, quisiera hablarte y preguntarte muchas cosas pero no tengo el valor y mucho menos abrir tu chat",
+            "agosto_5": "Hoy estoy viajando y mientras estaba en el bus escuché a una niña decir mi zapatico mi zapatico;) esa emoción que sentí fue tan rara y dolorosa que no pude sacar una sonrisa en todo el viaje",
+            "agosto_6": "Hoy mientras hacía un asado con mi hermano y mi cuñada me preguntaron y tú no estás conociendo a alguien y yo aún te tengo en mente a ti que les dije conocí a alguien que era perfecta pero por cosas del destino no se puede y me puse a pensar demasiado del por qué y mis emociones no se encontraban listas para contarle a alguien como me sentía, aún recuerdo que cuando me preguntaron eso solo quería llorar y abrazar a mi hermano que es alguien muy importante para mí",
+            "agosto_7": "Poco a poco trato de olvidar todo y todo, hoy quise eliminar tu chat pero tan solo me quedé ahí y lloré como un idiota",
+            "agosto_8": "Esto es raro y confuso, nunca te tuve cerca pero aún así sufro por ti y si de verdad me había enamorado de verdad, muy aparte de conocer tu físico fuiste alguien que me hizo ver el mundo distinto",
+            "agosto_9": "Hoy fue un día de mierda, cuando ya te olvidaba viene mi sobrina y me dice 'oye y a quien era a la q querías que mande audio y conozca' yo no sabía qué decir y cómo sentirme en ese momento pues tuve q decirle q le mentí y q no sea sapa jaja",
+            "agosto_10": "Jaja otro día de mierda hoy mi sobrina buscó chats con chicas q tenía y encontró tu chat y había leído todo lo q pasó y me miró y no sabía q decirle solo la saque de mi cuarto y me quedé toda la tarde y noche",
+            "agosto_11": "Esto es muy raro pero cada noche escribo algo en el bloc de notas, no se por qué lo hago solo es una forma de como abrir mi corazón sin decirle a nadie",
+            "agosto_12": "Aún esto me mata y me devasta quiero hacer muchas cosas pero cuando salgo veo o escucho algo y me recuerda a ti",
+            "agosto_13": "Mi mamá tendrá q dejar la ciudad y estaré viviendo solo, tú te fuiste y ella también se va mi mundo se cae a pedazos y no sé a quién contarle toda esta mierda q siento pero trataré de superar todo esto solo",
+            "agosto_14": "Desde que dejamos de hablar no volví a hacer un panqueque ya que hasta eso me recuerda a ti, pero hoy quise hacer uno y mientras lo hacía me tocaban las emociones de mi corazón",
+            "agosto_15": "Hoy es todo distinto me fui a jugar futbol, luego de eso me fui a mi casa y en mi play list se puso 'out of time' música q te dije alguna vez que me recordaba a ti ;) y mientras caminaba por la noche me puse a llorar solo",
+            "agosto_16": "Hoy fue un día distinto, no sabía si decirte o escribirte tenía pensado escribirte pero no pude, sali a la calle  pero cada cada que veía o escuchaba  me acordaba algo de ti todo eso me molestaba porque no sabía qué hacer sólo caminaba en la calle y no me ocupaba  de nada",
+            "agosto_17": "Hoy mientras buscaba una foto encontré una captura de una llamada y esa mierda me mató y me puse a llorar como un niño, no está ni mi madre para llorar en sus brazos pero no puedo necesito dejar todo esto por mi maldito bien",
+            "agosto_18": "Hoy fue un día tan ocupado que solo te pensé 2 veces y aún así esos recuerdos son fuertes y difíciles de olvidar",
+            "agosto_19": "Es raro hoy no pensé en nada conocí nuevas personas que me ocupé todo el rato y bueno espero de que estés bien pequitas",
+            "agosto_20": "Hoy dejare de escribir, siento que esto también aún me apega a ti y quiero olvidarte pero no puedo, ni el alcohol me saca tus recuerdos de mi cabeza, es raro yo era de los q decía q el alcohol no ayuda a olvidar y menos superar un despecho pero lo siento todo diferente, solo quiero que estés bien y ya aun así no sea yo el que te haga feliz pero hoy me despido de todo esto, no por que te haya olvidado sino por que quiero dejar de sufrir por algo que ya pasó y no quiero tener un mal recuerdo de ti ni mucho menos tenerte rencor, cuídate mi pequitas, mi  sweetheart🌸 te amo y quiero demasiado, aunque no lo leas siempre guardaré todo esto que escribí"
+        };
+
+        function renderCalendar() {
+            const julyGrid = document.getElementById('grid-july');
+            const augustGrid = document.getElementById('grid-august');
+
+            julyGrid.innerHTML = '';
+            augustGrid.innerHTML = '';
+
+            allDays.forEach((item, index) => {
+                const text = messagesData[item.key] || "";
+                const btn = document.createElement('button');
+                btn.className = 'p-4 rounded-2xl border bg-white border-stone-200 hover:border-amber-400 hover:bg-stone-50 text-stone-700 shadow-sm transition-all duration-300 flex flex-col items-center justify-center gap-1 group cursor-pointer relative';
+                
+                btn.innerHTML = `
+                    <span class="text-xs uppercase tracking-wider text-stone-400 group-hover:text-amber-700 transition">${item.monthName}</span>
+                    <span class="title-font text-2xl font-bold">${item.day}</span>
+                    <i class="fa-solid fa-seedling text-xs text-amber-600 opacity-60 group-hover:opacity-100 transition-opacity mt-1"></i>
+                `;
+
+                btn.onclick = () => openDay(index);
+
+                if (item.month === 'julio') {
+                    julyGrid.appendChild(btn);
+                } else {
+                    augustGrid.appendChild(btn);
+                }
+            });
+        }
+
+        function openDay(index) {
+            currentIndex = index;
+            const item = allDays[currentIndex];
+
+            document.getElementById('display-date-number').innerText = item.day;
+            document.getElementById('display-date-month').innerText = item.monthName;
+            document.getElementById('day-message-display').innerText = messagesData[item.key] || "No hay mensaje para este día.";
+
+            document.getElementById('calendar-view').classList.add('hidden');
+            document.getElementById('book-view').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function backToCalendar() {
+            document.getElementById('book-view').classList.add('hidden');
+            document.getElementById('calendar-view').classList.remove('hidden');
+            renderCalendar();
+        }
+
+        function navigateDay(direction) {
+            const newIndex = currentIndex + direction;
+            if (newIndex < 0 || newIndex >= allDays.length) {
+                return;
+            }
+
+            const pageCard = document.getElementById('page-card');
+            pageCard.classList.add('flipping');
+
+            setTimeout(() => {
+                currentIndex = newIndex;
+                const item = allDays[currentIndex];
+
+                document.getElementById('display-date-number').innerText = item.day;
+                document.getElementById('display-date-month').innerText = item.monthName;
+                document.getElementById('day-message-display').innerText = messagesData[item.key] || "No hay mensaje para este día.";
+
+                pageCard.classList.remove('flipping');
+            }, 400);
+        }
+
+        window.onload = function() {
+            renderCalendar();
+        };
+    </script>
+</body>
+</html>
